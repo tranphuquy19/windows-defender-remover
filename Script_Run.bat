@@ -4,6 +4,9 @@
 pushd "%CD%"
 CD /D "%~dp0"
 
+:: Check Windows Build Number
+for /f "tokens=2 delims==" %%I in ('wmic os get BuildNumber /value') do set "build=%%I"
+
 :: Arguments Section
 IF "%1"== "y" GOTO :removedef
 IF "%1"== "Y" GOTO :removedef
@@ -12,7 +15,6 @@ IF "%1"== "A" GOTO :removeantivirus
 IF "%1"== "S" GOTO :disablemitigations
 IF "%1"== "s" GOTO :disablemitigations
 :--------------------------------------
-
 
 :--------------------------------------
 cls
@@ -32,7 +34,6 @@ if errorlevel==2 goto removeantivirus
 if errorlevel==1 goto removedef
 :--------------------------------------
 
-
 :--------------------------------------
 goto :eof
 :--------------------------------------
@@ -43,8 +44,10 @@ CLS
 bcdedit /set hypervisorlaunchtype off
 
 CLS
-echo Removing Windows Security UWP App...
-Powershell -noprofile -executionpolicy bypass -file "%~dp0\RemoveSecHealthApp.ps1"
+if NOT "%build%"=="22000" (
+    echo Removing Windows Security UWP App...
+    Powershell -noprofile -executionpolicy bypass -file "%~dp0\RemoveSecHealthApp.ps1"
+)
 
 CLS
 echo Unregister Windows Defender Security Components...
@@ -68,8 +71,10 @@ CLS
 bcdedit /set hypervisorlaunchtype off
 
 CLS
-echo Removing Windows Security UWP App...
-Powershell -noprofile -executionpolicy bypass -file "%~dp0\RemoveSecHealthApp.ps1"
+if NOT "%build%"=="22000" (
+    echo Removing Windows Security UWP App...
+    Powershell -noprofile -executionpolicy bypass -file "%~dp0\RemoveSecHealthApp.ps1"
+)
 
 CLS
 echo Unregister Windows Defender Security Components...
